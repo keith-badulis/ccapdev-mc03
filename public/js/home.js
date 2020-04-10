@@ -16,7 +16,20 @@ $(document).ready(function () {
             - `#submit` is enabled
     */
     $('#number').keyup(function () {
-        // your code here
+        var number = $(this).val();
+
+        $.get('/getCheckNumber', {number: number}, function (data) {
+            if (data != '') {
+                $('#number').css('background-color', 'red');
+                $('#error').text('Number already registered');
+                $('#submit').prop('disabled', true);
+            } else {
+                $('#number').css('background-color', '#E3E3E3');
+                $('#error').text('');
+                $('#submit').prop('disabled', false);
+            }
+        })
+
     });
 
     /*
@@ -31,7 +44,17 @@ $(document).ready(function () {
             The name and the number fields are reset to empty values.
     */
     $('#submit').click(function () {
-        // your code here
+        var name = $('#name').val();
+        var number = $('#number').val();
+
+        $.get('/add', {name: name, number: number}, function (data, status) {
+            if (status == 'success') {
+                $('#name').val('');
+                $('#number').val('');
+
+                $('#contacts').append(data)
+            }
+        });
     });
 
     /*
@@ -42,7 +65,14 @@ $(document).ready(function () {
             class `.contact`.
     */
     $('#contacts').on('click', '.remove', function () {
-        // your code here
+        var numberElement = $(this).parent().find('.text')[1];
+        var number = $(numberElement).text();
+
+        $.get('/delete', {number: number}, function (data) {
+            if (data == 'success') {                
+                $(numberElement).parent().parent().remove();
+            }
+        })
     });
 
 })
